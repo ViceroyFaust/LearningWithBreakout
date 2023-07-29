@@ -10,24 +10,28 @@ import java.util.ArrayList;
 
 public class MyGdxGame extends ApplicationAdapter {
     // Setting up game objects
-    ShapeRenderer shape;
-    Ball ball;
-    Paddle paddle;
-    ArrayList<Block> blocks;
+    private ShapeRenderer shape;
+    private Ball ball;
+    private Paddle paddle;
+    private ArrayList<Block> blocks;
+
+    // Generates 13 x 8 blocks in the upper portion of the screen, leaving some empty space at the top
+    private void generateBlocks() {
+        int blockWidth = 60;
+        int blockHeight = 15;
+        for (int y = Gdx.graphics.getHeight() / 2 + 40; y < Gdx.graphics.getHeight() - 50; y += blockHeight + 2) {
+            for (int x = 0; x < Gdx.graphics.getWidth(); x += blockWidth + 2)
+                blocks.add(new Block(x, y, blockWidth, blockHeight));
+        }
+    }
 
     @Override
     public void create () { // Runs once at the beginning of the program
         shape = new ShapeRenderer();
-        ball = new Ball(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 3, 8, 3, -4);
-        paddle = new Paddle(0, 30, 80, 8);
+        ball = new Ball(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 3, 5, 3, -4);
+        paddle = new Paddle(0, 40, 50, 10);
         blocks = new ArrayList<>();
-
-        int blockWidth = 63;
-        int blockHeight = 20;
-        for (int y = Gdx.graphics.getHeight() / 2; y < Gdx.graphics.getHeight(); y += blockHeight + 10) {
-            for (int x = 0; x < Gdx.graphics.getWidth(); x += blockWidth + 10)
-                blocks.add(new Block(x, y, blockWidth, blockHeight));
-        }
+        generateBlocks();
     }
 
     @Override
@@ -50,6 +54,8 @@ public class MyGdxGame extends ApplicationAdapter {
             if (!CollisionHelper.isColliding(offsetBall, b)) ball.horizontalBounce();
             else ball.verticalBounce();
             b.destroy();
+            // Stop checking collision once one block is destroyed. Prevents destruction loops (bug).
+            break;
         }
         // Update and draw the ball
         ball.update();
