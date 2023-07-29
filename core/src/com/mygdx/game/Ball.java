@@ -1,6 +1,5 @@
 package com.mygdx.game;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
@@ -25,13 +24,15 @@ public class Ball implements Hitbox {
         x += xSpeed;
         y += ySpeed;
 
-        if (x - size < 0 || x + size > Gdx.graphics.getWidth()) xSpeed = -xSpeed;
-        if (y - size < 0 || y + size > Gdx.graphics.getHeight()) ySpeed = -ySpeed;
+        if (CollisionHelper.isHorizontalWallCollision(this)) xSpeed = -xSpeed;
+        if (CollisionHelper.isVerticalWallCollison(this)) ySpeed = -ySpeed;
     }
 
     public void paddleBounce(Paddle paddle) {
-        if (x < paddle.getX() + paddle.getLength() / 2) xSpeed = Math.abs(xSpeed) * -1;
-        else if (x > paddle.getX() + paddle.getLength() / 2) xSpeed = Math.abs(xSpeed);
+        int paddleCenterX = paddle.getX() + paddle.getLength() / 2;
+        int paddleBallDifferenceX = paddleCenterX - x;
+        float xFraction = paddleBallDifferenceX / (paddle.getLength() / 2.0f);
+        xSpeed = (int) (xFraction * ySpeed);
         ySpeed = -ySpeed;
     }
 

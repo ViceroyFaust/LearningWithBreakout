@@ -4,7 +4,6 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.GL20;
-import sun.awt.X11.InfoWindow;
 
 import java.util.ArrayList;
 
@@ -28,7 +27,7 @@ public class MyGdxGame extends ApplicationAdapter {
     @Override
     public void create () { // Runs once at the beginning of the program
         shape = new ShapeRenderer();
-        ball = new Ball(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 3, 5, 3, -4);
+        ball = new Ball(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2, 6, 0, -5);
         paddle = new Paddle(0, 40, 50, 10);
         blocks = new ArrayList<>();
         generateBlocks();
