@@ -19,8 +19,14 @@ public class Paddle implements Hitbox {
 
     public void update() {
         x = Gdx.input.getX() - length / 2;
-        if (CollisionHelper.isLeftWallCollision(this)) x = 0;
-        if (CollisionHelper.isRightWallCollision(this)) x = Gdx.graphics.getWidth() - length;
+    }
+
+    public void leftWallCollision() {
+        x = 0;
+    }
+
+    public void rightWallCollision() {
+        x = Gdx.graphics.getWidth() - length;
     }
 
     public void draw(ShapeRenderer shape) {
