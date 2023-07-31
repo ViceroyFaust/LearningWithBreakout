@@ -74,18 +74,17 @@ public class MyGdxGame extends ApplicationAdapter {
 
         shape.begin(ShapeRenderer.ShapeType.Filled); // Turn on the shape rendered
 
-        handleBallWallCollision();
-        handlePaddleWallCollision();
-
         handleBallPaddleCollision();
         handleBallBlockCollision();
 
         // Update and draw the ball
         ball.update();
+        handleBallWallCollision();
         ball.draw(shape);
 
         // Update and draw the paddle
         paddle.update();
+        handlePaddleWallCollision();
         paddle.draw(shape);
 
         // Redraw the blocks
