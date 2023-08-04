@@ -2,6 +2,7 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.GL20;
 
@@ -13,6 +14,7 @@ public class MyGdxGame extends ApplicationAdapter {
     private Ball ball;
     private Paddle paddle;
     private ArrayList<Block> blocks;
+    private boolean start = false;
 
     // Generates 13 x 8 blocks in the upper portion of the screen, leaving some empty space at the top
     private void generateBlocks() {
@@ -62,7 +64,7 @@ public class MyGdxGame extends ApplicationAdapter {
     public void create () { // Runs once at the beginning of the program
         shape = new ShapeRenderer();
         ball = new Ball(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2, 6, 0, -5);
-        paddle = new Paddle(0, 40, 50, 10);
+        paddle = new Paddle(Gdx.graphics.getWidth() / 2 - 25, 40, 50, 10);
         blocks = new ArrayList<>();
         generateBlocks();
     }
@@ -74,13 +76,17 @@ public class MyGdxGame extends ApplicationAdapter {
 
         shape.begin(ShapeRenderer.ShapeType.Filled); // Turn on the shape rendered
 
-        handleBallPaddleCollision();
-        handleBallBlockCollision();
-
-        // Update and draw the ball
-        ball.update();
-        handleBallWallCollision();
-        ball.draw(shape);
+        // Do not move anything until the game has started
+        if (start) {
+            handleBallPaddleCollision();
+            handleBallBlockCollision();
+            // Update and draw the ball
+            ball.update();
+            handleBallWallCollision();
+            ball.draw(shape);
+        } else if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)){
+            start = true;
+        }
 
         // Update and draw the paddle
         paddle.update();
