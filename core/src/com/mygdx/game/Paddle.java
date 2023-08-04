@@ -1,6 +1,7 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 
@@ -9,12 +10,14 @@ public class Paddle implements Hitbox {
     private int y;
     private int length;
     private int height;
+    private Color color;
 
-    public Paddle(int x, int y, int length, int height) {
+    public Paddle(int x, int y, int length, int height, Color color) {
         this.x = x;
         this.y = y;
         this.length = length;
         this.height = height;
+        this.color = color;
     }
 
     public void update() {
@@ -30,6 +33,7 @@ public class Paddle implements Hitbox {
     }
 
     public void draw(ShapeRenderer shape) {
+        shape.setColor(color);
         shape.rect(x, y, length, height);
     }
 

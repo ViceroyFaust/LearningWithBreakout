@@ -11,15 +11,16 @@ public class Ball implements Hitbox {
     private int size;
     private int xSpeed;
     private int ySpeed;
+    private Color color;
     private boolean paddleBounced = false;
-    private Color color = Color.WHITE;
 
-    public Ball(int x, int y, int size, int xSpeed, int ySpeed) {
+    public Ball(int x, int y, int size, int xSpeed, int ySpeed, Color color) {
         this.x = x;
         this.y = y;
         this.size = size;
         this.xSpeed = xSpeed;
         this.ySpeed = ySpeed;
+        this.color = color;
     }
 
     public void update() {
