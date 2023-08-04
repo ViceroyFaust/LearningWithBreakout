@@ -2,6 +2,7 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Rectangle;
+import org.w3c.dom.css.Rect;
 
 public class CollisionHelper {
 
@@ -30,11 +31,14 @@ public class CollisionHelper {
     }
 
     // Simple collision detection between two rectangular hit-boxes
-    public static boolean isColliding(Hitbox first, Hitbox second) {
-        Rectangle a = first.getHitbox();
-        Rectangle b = second.getHitbox();
-
-        return a.x <= b.x + b.width && a.x + a.width >= b.x &&
-                a.y + a.height >= b.y && a.y <= b.y + b.height;
+    public static boolean isColliding(Rectangle first, Rectangle second) {
+        return first.x <= second.x + second.width && first.x + first.width >= second.x &&
+                first.y + first.height >= second.y && first.y <= second.y + second.height;
     }
+
+    // Simple collision detection between two rectangular hit-boxes
+    public static boolean isColliding(Hitbox first, Hitbox second) {
+        return isColliding(first.getHitbox(), second.getHitbox());
+    }
+
 }

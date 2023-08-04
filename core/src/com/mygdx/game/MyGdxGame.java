@@ -6,6 +6,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.math.Rectangle;
 
 import java.util.ArrayList;
 
@@ -58,13 +59,13 @@ public class MyGdxGame extends ApplicationAdapter {
     // Check whether the ball is making contact with one of the blocks and react accordingly
     private void handleBallBlockCollision() {
         // Offset the ball to check what side of the block it hit
-        Ball offsetBall = new Ball(ball.getX() - ball.getxSpeed(), ball.getY(), ball.getSize(), 0, 0,
-        new Color(0xFFFFFFFF));
+        Rectangle offsetBall = ball.getHitbox();
+        offsetBall.setX(offsetBall.x - ball.getxSpeed());
         for (Block b : blocks) {
             // Base case - there is nothing to do if the ball is destroyed or there is no collision
             if (b.isDestroyed() || !CollisionHelper.isColliding(ball, b)) continue;
             // Check whether the offset is colliding to determine whether to bounce horizontally or vertically
-            if (!CollisionHelper.isColliding(offsetBall, b)) ball.horizontalBounce();
+            if (!CollisionHelper.isColliding(offsetBall, b.getHitbox())) ball.horizontalBounce();
             else ball.verticalBounce();
             b.destroy();
             // Stop checking collision once one block is destroyed. Prevents destruction loops (bug).
