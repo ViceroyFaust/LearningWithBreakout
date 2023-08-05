@@ -4,6 +4,8 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.Rectangle;
@@ -13,6 +15,7 @@ import java.util.ArrayList;
 public class MyGdxGame extends ApplicationAdapter {
     // Setting up game objects
     private ShapeRenderer shape;
+    private SpriteBatch batch;
     private Ball ball;
     private Paddle paddle;
     private ArrayList<Block> blocks;
@@ -22,8 +25,11 @@ public class MyGdxGame extends ApplicationAdapter {
                                     new Color(0xb8bb26ff), new Color(0x98971aff) };
     private Color ballColor = new Color(0xfbf1c7ff);
     private Color paddleColor = new Color(0xd5c4a1ff);
+    private Color fontColor = new Color(0xebdbb2ff);
+    private BitmapFont font;
 
     private boolean start = false;
+    private int score = 0;
 
     // Generates 13 x 8 blocks in the upper portion of the screen, leaving some empty space at the top
     private void generateBlocks() {
@@ -33,7 +39,7 @@ public class MyGdxGame extends ApplicationAdapter {
         int colorIndex = 7;
         for (int y = Gdx.graphics.getHeight() / 2 + 60; y < Gdx.graphics.getHeight() - 50; y += blockHeight + 2) {
             for (int x = 0; x < Gdx.graphics.getWidth(); x += blockWidth + 2)
-                blocks.add(new Block(x, y, blockWidth, blockHeight, blockColors[colorIndex]));
+                blocks.add(new Block(x, y, blockWidth, blockHeight, 8 - colorIndex, blockColors[colorIndex]));
             --colorIndex;
         }
     }
@@ -67,6 +73,7 @@ public class MyGdxGame extends ApplicationAdapter {
             // Check whether the offset is colliding to determine whether to bounce horizontally or vertically
             if (!CollisionHelper.isColliding(offsetBall, b.getHitbox())) ball.horizontalBounce();
             else ball.verticalBounce();
+            score += b.getPoints();
             b.destroy();
             // Stop checking collision once one block is destroyed. Prevents destruction loops (bug).
             break;
@@ -76,12 +83,15 @@ public class MyGdxGame extends ApplicationAdapter {
     @Override
     public void create () { // Runs once at the beginning of the program
         shape = new ShapeRenderer();
+        batch = new SpriteBatch();
         ball = new Ball(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2, 6, 0, -5,
                 ballColor);
         paddle = new Paddle(Gdx.graphics.getWidth() / 2 - 25, 40, 50, 10,
                 paddleColor);
         blocks = new ArrayList<>();
         generateBlocks();
+        font = new BitmapFont(Gdx.files.internal("classic_console_neue.fnt"));
+        font.setColor(fontColor);
     }
 
     @Override
@@ -115,5 +125,11 @@ public class MyGdxGame extends ApplicationAdapter {
             if (!b.isDestroyed()) b.draw(shape);
 
         shape.end(); // Turn off the shape renderer
+
+        batch.begin();
+
+        font.draw(batch, "Score: " + score, 10, Gdx.graphics.getHeight() - 10);
+
+        batch.end();
     }
 }

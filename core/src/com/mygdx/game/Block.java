@@ -9,14 +9,16 @@ public class Block implements Hitbox {
     private int y;
     private int length;
     private int height;
+    private int points;
     private Color color;
     private boolean destroyed;
 
-    public Block(int x, int y, int length, int height, Color color) {
+    public Block(int x, int y, int length, int height, int points, Color color) {
         this.x = x;
         this.y = y;
         this.length = length;
         this.height = height;
+        this.points = points;
         this.color = color;
         destroyed = false;
     }
@@ -43,6 +45,10 @@ public class Block implements Hitbox {
 
     public int getHeight() {
         return height;
+    }
+
+    public int getPoints() {
+        return points;
     }
 
     public void draw(ShapeRenderer shape) {
