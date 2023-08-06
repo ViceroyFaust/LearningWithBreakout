@@ -19,6 +19,10 @@ public class MyGdxGame extends ApplicationAdapter {
     private Ball ball;
     private Paddle paddle;
     private ArrayList<Block> blocks;
+    private BitmapFont font;
+    private int ballStartX;
+    private int ballStartY;
+
     private Color[] blockColors = { new Color(0xd3869bff), new Color(0xb16286ff),
                                     new Color(0x83a598ff), new Color(0x458588ff),
                                     new Color(0x8ec07cff), new Color(0x689d6aff),
@@ -26,10 +30,10 @@ public class MyGdxGame extends ApplicationAdapter {
     private Color ballColor = new Color(0xfbf1c7ff);
     private Color paddleColor = new Color(0xd5c4a1ff);
     private Color fontColor = new Color(0xebdbb2ff);
-    private BitmapFont font;
 
     private boolean start = false;
     private int score = 0;
+    private int lives = 3;
 
     // Generates 13 x 8 blocks in the upper portion of the screen, leaving some empty space at the top
     private void generateBlocks() {
@@ -46,9 +50,14 @@ public class MyGdxGame extends ApplicationAdapter {
 
     private void handleBallWallCollision() {
         if (CollisionHelper.isLeftWallCollision(ball)) ball.leftWallBounce();
-        if (CollisionHelper.isRightWallCollision(ball)) ball.rightWallBounce();
-        if (CollisionHelper.isCeilingCollision(ball)) ball.ceilingBounce();
-        if (CollisionHelper.isFloorCollision(ball)) ball.floorBounce();
+        else if (CollisionHelper.isRightWallCollision(ball)) ball.rightWallBounce();
+        else if (CollisionHelper.isCeilingCollision(ball)) ball.ceilingBounce();
+        else if (CollisionHelper.isFloorCollision(ball)) {
+            ball.setX(ballStartX);
+            ball.setY(ballStartY);
+            --lives;
+            start = false;
+        }
     }
 
     private void handlePaddleWallCollision() {
@@ -82,9 +91,12 @@ public class MyGdxGame extends ApplicationAdapter {
 
     @Override
     public void create () { // Runs once at the beginning of the program
+        ballStartX = Gdx.graphics.getWidth() / 2;
+        ballStartY = Gdx.graphics.getHeight() / 2;
+
         shape = new ShapeRenderer();
         batch = new SpriteBatch();
-        ball = new Ball(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2, 6, 0, -5,
+        ball = new Ball(ballStartX, ballStartY, 6, 0, -5,
                 ballColor);
         paddle = new Paddle(Gdx.graphics.getWidth() / 2 - 25, 40, 50, 10,
                 paddleColor);
@@ -105,12 +117,12 @@ public class MyGdxGame extends ApplicationAdapter {
 
         // Do not move anything until the game has started
         if (start) {
+            // Update and draw the ball
+            ball.draw(shape);
+            ball.update();
             handleBallPaddleCollision();
             handleBallBlockCollision();
-            // Update and draw the ball
-            ball.update();
             handleBallWallCollision();
-            ball.draw(shape);
         } else if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)){
             start = true;
         }
@@ -129,6 +141,7 @@ public class MyGdxGame extends ApplicationAdapter {
         batch.begin();
 
         font.draw(batch, "Score: " + score, 10, Gdx.graphics.getHeight() - 10);
+        font.draw(batch, "Balls: " + lives, 200, Gdx.graphics.getHeight() - 10);
 
         batch.end();
     }

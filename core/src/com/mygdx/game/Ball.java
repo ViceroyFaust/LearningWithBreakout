@@ -92,6 +92,14 @@ public class Ball implements Hitbox {
         return size;
     }
 
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public void setY(int y) {
+        this.y = y;
+    }
+
     public void draw(ShapeRenderer shape) {
         shape.setColor(color);
         shape.circle(x, y, size);
