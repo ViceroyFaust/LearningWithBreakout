@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.GL20;
@@ -16,12 +17,14 @@ public class MyGdxGame extends ApplicationAdapter {
     // Setting up game objects
     private ShapeRenderer shape;
     private SpriteBatch batch;
+    private int ballStartX;
+    private int ballStartY;
     private Ball ball;
     private Paddle paddle;
     private ArrayList<Block> blocks;
     private BitmapFont font;
-    private int ballStartX;
-    private int ballStartY;
+    private GlyphLayout layout;
+    private String gameOverMessage;
 
     private Color[] blockColors = { new Color(0xd3869bff), new Color(0xb16286ff),
                                     new Color(0x83a598ff), new Color(0x458588ff),
@@ -91,11 +94,10 @@ public class MyGdxGame extends ApplicationAdapter {
 
     @Override
     public void create () { // Runs once at the beginning of the program
-        ballStartX = Gdx.graphics.getWidth() / 2;
-        ballStartY = Gdx.graphics.getHeight() / 2;
-
         shape = new ShapeRenderer();
         batch = new SpriteBatch();
+        ballStartX = Gdx.graphics.getWidth() / 2;
+        ballStartY = Gdx.graphics.getHeight() / 2;
         ball = new Ball(ballStartX, ballStartY, 6, 0, -5,
                 ballColor);
         paddle = new Paddle(Gdx.graphics.getWidth() / 2 - 25, 40, 50, 10,
@@ -104,6 +106,9 @@ public class MyGdxGame extends ApplicationAdapter {
         generateBlocks();
         font = new BitmapFont(Gdx.files.internal("classic_console_neue.fnt"));
         font.setColor(fontColor);
+        layout = new GlyphLayout();
+        gameOverMessage = "GAME OVER!";
+        layout.setText(font, gameOverMessage);
     }
 
     @Override
@@ -130,7 +135,7 @@ public class MyGdxGame extends ApplicationAdapter {
             handleBallPaddleCollision();
             handleBallBlockCollision();
             handleBallWallCollision();
-        } else if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)){
+        } else if (lives > 0 && Gdx.input.isButtonPressed(Input.Buttons.LEFT)){
             start = true;
         }
 
@@ -149,6 +154,9 @@ public class MyGdxGame extends ApplicationAdapter {
 
         font.draw(batch, "Score: " + score, 10, Gdx.graphics.getHeight() - 10);
         font.draw(batch, "Balls: " + lives, 200, Gdx.graphics.getHeight() - 10);
+        if (lives <= 0)
+            font.draw(batch, gameOverMessage, (Gdx.graphics.getWidth()  - layout.width) / 2,
+                    (Gdx.graphics.getHeight() - layout.height)/ 2);
 
         batch.end();
     }
