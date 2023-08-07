@@ -107,6 +107,13 @@ public class MyGdxGame extends ApplicationAdapter {
     }
 
     @Override
+    public void dispose() {
+        shape.dispose();
+        batch.dispose();
+        font.dispose();
+    }
+
+    @Override
     public void render () { // Runs every frame
         // Set background color to #32302f
         Gdx.gl.glClearColor(50/255f, 48/255f, 47/255f, 1);
