@@ -45,17 +45,21 @@ public class MyGdxGame extends ApplicationAdapter {
 
         int colorIndex = 7;
         for (int y = Gdx.graphics.getHeight() / 2 + 60; y < Gdx.graphics.getHeight() - 50; y += blockHeight + 2) {
-            for (int x = 0; x < Gdx.graphics.getWidth(); x += blockWidth + 2)
+            for (int x = 0; x < Gdx.graphics.getWidth(); x += blockWidth + 2) {
                 blocks.add(new Block(x, y, blockWidth, blockHeight, 8 - colorIndex, blockColors[colorIndex]));
+            }
             --colorIndex;
         }
     }
 
     private void handleBallWallCollision() {
-        if (CollisionHelper.isLeftWallCollision(ball)) ball.leftWallBounce();
-        else if (CollisionHelper.isRightWallCollision(ball)) ball.rightWallBounce();
-        else if (CollisionHelper.isCeilingCollision(ball)) ball.ceilingBounce();
-        else if (CollisionHelper.isFloorCollision(ball)) {
+        if (CollisionHelper.isLeftWallCollision(ball)) {
+            ball.leftWallBounce();
+        } else if (CollisionHelper.isRightWallCollision(ball)) {
+            ball.rightWallBounce();
+        } else if (CollisionHelper.isCeilingCollision(ball)) {
+            ball.ceilingBounce();
+        } else if (CollisionHelper.isFloorCollision(ball)) {
             ball.setX(ballStartX);
             ball.setY(ballStartY);
             --lives;
@@ -64,14 +68,18 @@ public class MyGdxGame extends ApplicationAdapter {
     }
 
     private void handlePaddleWallCollision() {
-        if (CollisionHelper.isLeftWallCollision(paddle)) paddle.leftWallCollision();
-        if (CollisionHelper.isRightWallCollision(paddle)) paddle.rightWallCollision();
+        if (CollisionHelper.isLeftWallCollision(paddle)) {
+            paddle.leftWallCollision();
+        } else if (CollisionHelper.isRightWallCollision(paddle)) {
+            paddle.rightWallCollision();
+        }
     }
 
     // Check whether the paddle and the ball made contact and react accordingly
     private void handleBallPaddleCollision() {
-        if (CollisionHelper.isColliding(paddle, ball))
+        if (CollisionHelper.isColliding(paddle, ball)) {
             ball.paddleBounce(paddle);
+        }
     }
 
     // Check whether the ball is making contact with one of the blocks and react accordingly
@@ -90,6 +98,77 @@ public class MyGdxGame extends ApplicationAdapter {
             // Stop checking collision once one block is destroyed. Prevents destruction loops (bug).
             break;
         }
+    }
+
+    private void clearScreen() {
+        // Set background color to  R50, G48, B47
+        Gdx.gl.glClearColor(50/255f, 48/255f, 47/255f, 1);
+        // Clear the screen each render to prevent trailing
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+    }
+
+    // Update and draw the ball
+    private void ballLoop() {
+        ball.draw(shape);
+        ball.update();
+        handleBallPaddleCollision();
+        handleBallBlockCollision();
+        handleBallWallCollision();
+    }
+
+    // Update and draw the paddle
+    private void paddleLoop() {
+        paddle.update();
+        handlePaddleWallCollision();
+        paddle.draw(shape);
+
+    }
+
+    // Draw the blocks
+    private void blockLoop() {
+        for (Block b : blocks)
+            if (!b.isDestroyed()) b.draw(shape);
+    }
+
+    // Render shapeRenderer objects
+    private void renderShapes() {
+        shape.begin(ShapeRenderer.ShapeType.Filled); // Turn on the shape rendered
+
+        // Do not move the ball until the game has started
+        if (start) {
+            ballLoop();
+        } else if (lives > 0 && Gdx.input.isButtonPressed(Input.Buttons.LEFT)){
+            start = true;
+        }
+        paddleLoop();
+        blockLoop();
+
+        shape.end(); // Turn off the shape renderer
+    }
+
+    private void drawScore() {
+        font.draw(batch, "Score: " + score, 10, Gdx.graphics.getHeight() - 10);
+    }
+
+    private void drawLives() {
+        font.draw(batch, "Balls: " + lives, 200, Gdx.graphics.getHeight() - 10);
+    }
+
+    private void drawGameOver() {
+        font.draw(batch, gameOverMessage, (Gdx.graphics.getWidth()  - layout.width) / 2,
+                (Gdx.graphics.getHeight() - layout.height)/ 2);
+    }
+
+    // Render the game's text
+    private void renderText() {
+        batch.begin();
+
+        drawScore();
+        drawLives();
+        if (lives <= 0)
+            drawGameOver();
+
+        batch.end();
     }
 
     @Override
@@ -119,45 +198,9 @@ public class MyGdxGame extends ApplicationAdapter {
     }
 
     @Override
-    public void render () { // Runs every frame
-        // Set background color to #32302f
-        Gdx.gl.glClearColor(50/255f, 48/255f, 47/255f, 1);
-        // Clear the screen each render to prevent trailing
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        shape.begin(ShapeRenderer.ShapeType.Filled); // Turn on the shape rendered
-
-        // Do not move anything until the game has started
-        if (start) {
-            // Update and draw the ball
-            ball.draw(shape);
-            ball.update();
-            handleBallPaddleCollision();
-            handleBallBlockCollision();
-            handleBallWallCollision();
-        } else if (lives > 0 && Gdx.input.isButtonPressed(Input.Buttons.LEFT)){
-            start = true;
-        }
-
-        // Update and draw the paddle
-        paddle.update();
-        handlePaddleWallCollision();
-        paddle.draw(shape);
-
-        // Redraw the blocks
-        for (Block b : blocks)
-            if (!b.isDestroyed()) b.draw(shape);
-
-        shape.end(); // Turn off the shape renderer
-
-        batch.begin();
-
-        font.draw(batch, "Score: " + score, 10, Gdx.graphics.getHeight() - 10);
-        font.draw(batch, "Balls: " + lives, 200, Gdx.graphics.getHeight() - 10);
-        if (lives <= 0)
-            font.draw(batch, gameOverMessage, (Gdx.graphics.getWidth()  - layout.width) / 2,
-                    (Gdx.graphics.getHeight() - layout.height)/ 2);
-
-        batch.end();
+    public void render() { // Runs every frame
+        clearScreen();
+        renderShapes();
+        renderText();
     }
 }
