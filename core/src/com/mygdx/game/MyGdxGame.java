@@ -3,6 +3,7 @@ package com.mygdx.game;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
@@ -25,6 +26,10 @@ public class MyGdxGame extends ApplicationAdapter {
     private BitmapFont font;
     private GlyphLayout layout;
     private String gameOverMessage;
+    private Sound paddleBeep;
+    private Sound wallBeep;
+    private Sound brickBeep;
+    private Sound lossBeep;
 
     private Color[] blockColors = { new Color(0xd3869bff), new Color(0xb16286ff),
                                     new Color(0x83a598ff), new Color(0x458588ff),
@@ -55,15 +60,19 @@ public class MyGdxGame extends ApplicationAdapter {
     private void handleBallWallCollision() {
         if (CollisionHelper.isLeftWallCollision(ball)) {
             ball.leftWallBounce();
+            wallBeep.play();
         } else if (CollisionHelper.isRightWallCollision(ball)) {
             ball.rightWallBounce();
+            wallBeep.play();
         } else if (CollisionHelper.isCeilingCollision(ball)) {
             ball.ceilingBounce();
+            wallBeep.play();
         } else if (CollisionHelper.isFloorCollision(ball)) {
             ball.setX(ballStartX);
             ball.setY(ballStartY);
             --lives;
             start = false;
+            lossBeep.play();
         }
     }
 
@@ -79,6 +88,7 @@ public class MyGdxGame extends ApplicationAdapter {
     private void handleBallPaddleCollision() {
         if (CollisionHelper.isColliding(paddle, ball)) {
             ball.paddleBounce(paddle);
+            paddleBeep.play();
         }
     }
 
@@ -95,6 +105,7 @@ public class MyGdxGame extends ApplicationAdapter {
             else ball.verticalBounce();
             score += b.getPoints();
             b.destroy();
+            brickBeep.play();
             // Stop checking collision once one block is destroyed. Prevents destruction loops (bug).
             break;
         }
@@ -173,21 +184,30 @@ public class MyGdxGame extends ApplicationAdapter {
 
     @Override
     public void create () { // Runs once at the beginning of the program
+        // Set up the Shape and Sprite rendering batches
         shape = new ShapeRenderer();
         batch = new SpriteBatch();
+        // Calculate the ball's starting coordinates
         ballStartX = Gdx.graphics.getWidth() / 2;
         ballStartY = Gdx.graphics.getHeight() / 2;
+        // Generate ball, paddle, and blocks
         ball = new Ball(ballStartX, ballStartY, 6, 0, -5,
                 ballColor);
         paddle = new Paddle(Gdx.graphics.getWidth() / 2 - 25, 40, 50, 10,
                 paddleColor);
         blocks = new ArrayList<>();
         generateBlocks();
+        // Load and configure game font
         font = new BitmapFont(Gdx.files.internal("classic_console_neue.fnt"));
         font.setColor(fontColor);
         layout = new GlyphLayout();
         gameOverMessage = "GAME OVER!";
         layout.setText(font, gameOverMessage);
+        // Load sound effects
+        paddleBeep = Gdx.audio.newSound(Gdx.files.internal("paddle.wav"));
+        wallBeep = Gdx.audio.newSound(Gdx.files.internal("wall.wav"));
+        brickBeep = Gdx.audio.newSound(Gdx.files.internal("brick.wav"));
+        lossBeep = Gdx.audio.newSound(Gdx.files.internal("loss.wav"));
     }
 
     @Override
@@ -195,6 +215,10 @@ public class MyGdxGame extends ApplicationAdapter {
         shape.dispose();
         batch.dispose();
         font.dispose();
+        paddleBeep.dispose();
+        wallBeep.dispose();
+        brickBeep.dispose();
+        lossBeep.dispose();
     }
 
     @Override
