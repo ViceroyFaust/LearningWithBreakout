@@ -39,6 +39,7 @@ public class MyGdxGame extends ApplicationAdapter {
     private Color paddleColor = new Color(0xd5c4a1ff);
     private Color fontColor = new Color(0xebdbb2ff);
 
+    private boolean ballHitPaddle = false;
     private boolean start = false;
     private int score = 0;
     private int lives = 3;
@@ -60,18 +61,22 @@ public class MyGdxGame extends ApplicationAdapter {
     private void handleBallWallCollision() {
         if (CollisionHelper.isLeftWallCollision(ball)) {
             ball.leftWallBounce();
+            ballHitPaddle = false;
             wallBeep.play();
         } else if (CollisionHelper.isRightWallCollision(ball)) {
             ball.rightWallBounce();
+            ballHitPaddle = false;
             wallBeep.play();
         } else if (CollisionHelper.isCeilingCollision(ball)) {
             ball.ceilingBounce();
+            ballHitPaddle = false;
             wallBeep.play();
         } else if (CollisionHelper.isFloorCollision(ball)) {
             ball.setX(ballStartX);
             ball.setY(ballStartY);
             --lives;
             start = false;
+            ballHitPaddle = false;
             lossBeep.play();
         }
     }
@@ -86,8 +91,9 @@ public class MyGdxGame extends ApplicationAdapter {
 
     // Check whether the paddle and the ball made contact and react accordingly
     private void handleBallPaddleCollision() {
-        if (CollisionHelper.isColliding(paddle, ball)) {
+        if (!ballHitPaddle && CollisionHelper.isColliding(paddle, ball)) {
             ball.paddleBounce(paddle);
+            ballHitPaddle = true;
             paddleBeep.play();
         }
     }
@@ -105,6 +111,7 @@ public class MyGdxGame extends ApplicationAdapter {
             else ball.verticalBounce();
             score += b.getPoints();
             b.destroy();
+            ballHitPaddle = false;
             brickBeep.play();
             // Stop checking collision once one block is destroyed. Prevents destruction loops (bug).
             break;
